@@ -1,0 +1,8 @@
+selenium==4.43.0
+webdriver-manager==4.0.2
+robotframework==7.4.2
+robotframework-seleniumlibrary==6.8.0
+robotframework-pythonlibcore==4.5.0
+beautifulsoup4==4.14.3
+soupsieve==2.8.3
+requests==2.32.5
