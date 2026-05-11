@@ -26,3 +26,12 @@ def create_driver(headless: bool = False) -> webdriver.Chrome:
     driver = webdriver.Chrome(service=service, options=options)
 
     return driver
+
+def wait_for_element():
+    ...
+
+def dismiss_cookie_popup():
+    ...
+
+def get_team_matches():
+    ...
