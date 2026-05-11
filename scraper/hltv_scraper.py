@@ -38,8 +38,16 @@ def wait_for_element(driver: webdriver.Chrome, by: By, selector: str, timeout: i
         EC.presence_of_element_located((by, selector))
     )
 
-def dismiss_cookie_popup():
-    ...
+def dismiss_cookie_popup(driver: webdriver.Chrome):
+    try:
+        accept_btn = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, ".CybotCookiebotDialogBodyButton"))
+        )
+        accept_btn.click()
+        print("Cookie popup dismissed")
+        time.sleep(1)
+    except TimeoutException:
+        print("No cookie popup found, continue")
 
 def get_team_matches():
     ...
