@@ -134,3 +134,87 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
         print("\n[*] Browser closed.")
 
     return matches
+
+def get_tournament_matches(tournament_name: str, headless: bool = False) -> list[dict]:
+    driver = create_driver(headless=headless)
+    matches = []
+
+    try:
+        print(f"\n[*] Searching HLTV for tournament: '{tournament_name}'")
+
+        search_url = f"https://www.hltv.org/search#query={tournament_name.replace(' ', '%20')}"
+        driver.get(search_url)
+        dismiss_cookie_popup(driver)
+
+        # find the event/tournament link in search results
+        try:
+            event_link = wait_for_element(
+                driver,
+                By.CSS_SELECTOR,
+                ".result-con .event a",
+                timeout=10
+            )
+            event_url = event_link.get_attribute("href")
+            event_display_name = event_link.text.strip()
+            print(f"  [+] Found event: '{event_display_name}' -> {event_url}")
+        except TimeoutException:
+            print(f"  [-] Could not find tournament '{tournament_name}' on HLTV.")
+            return []
+
+        # navigate to the event's matches page
+        driver.get(event_url)
+        time.sleep(2)
+        dismiss_cookie_popup(driver)
+
+        # wait for match schedule to load
+        try:
+            wait_for_element(driver, By.CSS_SELECTOR, ".matchday", timeout=12)
+        except TimeoutException:
+            print("  [-] Match schedule did not load.")
+            return []
+
+        match_rows = driver.find_elements(By.CSS_SELECTOR, ".matchday .match a.matchRowLink")
+        print(f"  [+] Found {len(match_rows)} match(es). Extracting...\n")
+
+        for row in match_rows:
+            try:
+                team1 = row.find_element(By.CSS_SELECTOR, ".matchTeams span:nth-child(1)").text.strip()
+                team2 = row.find_element(By.CSS_SELECTOR, ".matchTeams span:nth-child(3)").text.strip()
+                date  = row.find_element(By.CSS_SELECTOR, ".matchTime").text.strip()
+                url   = row.get_attribute("href")
+
+                match = {
+                    "team1": team1,
+                    "team2": team2,
+                    "event": event_display_name,
+                    "date": date,
+                    "match_url": url,
+                }
+                matches.append(match)
+
+            except NoSuchElementException:
+                continue
+
+    finally:
+        driver.quit()
+        print("\n[*] Browser closed.")
+
+    return matches
+
+def print_matches(matches: list[dict], label: str = "Upcoming Matches"):
+    print(f"\n{'='*50}")
+    print(f"  {label}")
+    print(f"{'='*50}")
+
+    if not matches:
+        print("  No matches to display.")
+        return
+
+    for i, match in enumerate(matches, start=1):
+        print(f"\n  Match {i}:")
+        print(f"    {match['team1']}  vs  {match['team2']}")
+        print(f"    Event : {match['event']}")
+        print(f"    Date  : {match['date']}")
+        print(f"    Link  : {match['match_url']}")
+
+    print(f"\n{'='*50}\n")
