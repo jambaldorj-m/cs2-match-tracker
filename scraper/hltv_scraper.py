@@ -72,7 +72,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
                 ".result-con .team a",
                 timeout=10
             )
-            # get_attribute returns str | None — guard against None before use
+            # get_attribute returns str | None
             team_url: str | None = team_link.get_attribute("href")
             if not team_url:
                 print(f"  [-] Found team element but href was empty.")
@@ -123,7 +123,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
                 event: str = row.find_element(By.CSS_SELECTOR, ".matchEvent .matchEventName").text.strip()
                 date: str  = row.find_element(By.CSS_SELECTOR, ".matchTime").text.strip()
 
-                # get_attribute returns str | None — skip row if href missing
+                # get_attribute returns str | None
                 match_url: str | None = row.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
                 if not match_url:
                     continue
