@@ -58,7 +58,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
         print(f"\n[*] Searching HLTV for: '{team_name}'")
 
         # navigate to HLTV team search
-        search_url = f"https://www.hltv.org/search#query={team_name.replace(' ', '%20')}"
+        search_url = f"https://www.hltv.org/search#query={team_name.replace(" ", "+")}"
         driver.get(search_url)
         print(f"  [+] Navigated to: {search_url}")
 
@@ -86,7 +86,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
             return []
 
         # navigate to the team's matches tab
-        # team_url is guaranteed str here (None check above)
         matches_url = team_url + "#tab-matchesBox"
         driver.get(matches_url)
         print("  [+] Loading team matches page...")
@@ -154,7 +153,7 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
     try:
         print(f"\n[*] Searching HLTV for tournament: '{tournament_name}'")
 
-        search_url = f"https://www.hltv.org/search#query={tournament_name.replace(' ', '%20')}"
+        search_url = f"https://www.hltv.org/search#query={tournament_name.replace(" ", "+")}"
         driver.get(search_url)
         dismiss_cookie_popup(driver)
 
