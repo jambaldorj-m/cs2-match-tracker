@@ -225,10 +225,6 @@ def print_matches(matches: list[dict], label: str = "Upcoming Matches") -> None:
     print(f"  {label}")
     print(f"{'='*50}")
 
-    if not matches:
-        print("  No matches to display.")
-        return
-
     for i, match in enumerate(matches, start=1):
         print(f"\n  Match {i}:")
         print(f"    {match['team1']}  vs  {match['team2']}")
