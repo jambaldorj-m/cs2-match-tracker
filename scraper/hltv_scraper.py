@@ -10,6 +10,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 
 HLTV_URL = "https://www.hltv.org"
+WAIT_TIME = 10
 
 def _create_driver(headless: bool = False) -> webdriver.Chrome:
     options = Options()
@@ -36,7 +37,7 @@ def _create_driver(headless: bool = False) -> webdriver.Chrome:
 
 def _get_first_result(driver: webdriver.Chrome) -> WebElement | None:
     try:
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, WAIT_TIME).until(
             EC.presence_of_element_located((By.XPATH, "//td[@class='table-header']"))
         )
 
@@ -59,7 +60,7 @@ def _extract_team_matches(driver: webdriver.Chrome, display_name: str) -> list[d
     matches: list[dict] = []
 
     try:
-        WebDriverWait(driver, 12).until(
+        WebDriverWait(driver, WAIT_TIME).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".table-container.match-table"))
         )
     except TimeoutException:
@@ -117,7 +118,7 @@ def _extract_tournament_matches(driver: webdriver.Chrome, event_display_name: st
     matches: list[dict] = []
 
     try:
-        WebDriverWait(driver, 12).until(
+        WebDriverWait(driver, WAIT_TIME).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".matchday"))
         )
     except TimeoutException:
