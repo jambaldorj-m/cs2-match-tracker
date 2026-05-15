@@ -2,7 +2,7 @@ from scraper.hltv_scraper import get_team_matches, get_tournament_matches, print
 
 def main() -> None:
     print("What would you like to search?")
-    print("  1. Upcoming matches for a team")
+    print("  1. Matches for a team")
     print("  2. Matches in a tournament")
 
     option = input("Enter option (1/2): ").strip().lower()
