@@ -14,8 +14,7 @@ def main() -> None:
                 print("No team name entered.")
                 return
             matches = get_team_matches(team, headless=False)
-            if matches:
-                print_matches(matches, label=f"Matches - {team}")
+            print_matches(matches, label=f"Matches - {team}")
 
         case "2":
             tournament = input("Enter tournament name (e.g. PGL Major 2025): ").strip()
@@ -23,8 +22,7 @@ def main() -> None:
                 print("No tournament name entered.")
                 return
             matches = get_tournament_matches(tournament, headless=False)
-            if matches:
-                print_matches(matches, label=f"Matches - {tournament}")
+            print_matches(matches, label=f"Matches - {tournament}")
 
         case _:
             print("Invalid option.")
