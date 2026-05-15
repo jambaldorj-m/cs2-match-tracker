@@ -34,11 +34,6 @@ def create_driver(headless: bool = False) -> webdriver.Chrome:
 
     return driver
 
-def wait_for_element(driver: webdriver.Chrome, by: str, selector: str, timeout: int = 10) -> WebElement:
-    return WebDriverWait(driver, timeout).until(
-        EC.presence_of_element_located((by, selector))
-    )
-
 def dismiss_cookie_popup(driver: webdriver.Chrome) -> None:
     try:
         accept_btn = WebDriverWait(driver, 5).until(
@@ -49,6 +44,28 @@ def dismiss_cookie_popup(driver: webdriver.Chrome) -> None:
         time.sleep(1)
     except TimeoutException:
         print("  [*] No cookie popup found, continuing...")
+
+def get_first_result(driver: webdriver.Chrome) -> WebElement | None:
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//td[@class='table-header']"))
+        )
+
+        results: list[WebElement] = driver.find_elements(
+                By.XPATH,
+                "(//td[contains(@class,'table-header') and (text()='Team' or text()='Event')]/following::td/a)[1]"
+            )
+
+        if not results:
+            print("  [-] No matching search results found.")
+            return None
+
+        first = results[0]
+        return first
+
+    except TimeoutException:
+        print("  [-] Search results did not load in time.")
+        return None
 
 def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
     driver = create_driver(headless=headless)
