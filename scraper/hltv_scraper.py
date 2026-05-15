@@ -34,17 +34,6 @@ def _create_driver(headless: bool = False) -> webdriver.Chrome:
 
     return driver
 
-def _dismiss_cookie_popup(driver: webdriver.Chrome) -> None:
-    try:
-        accept_btn = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, ".CybotCookiebotDialogBodyButton"))
-        )
-        accept_btn.click()
-        print("  [+] Cookie popup dismissed.")
-        time.sleep(1)
-    except TimeoutException:
-        print("  [*] No cookie popup found, continuing...")
-
 def _get_first_result(driver: webdriver.Chrome) -> WebElement | None:
     try:
         WebDriverWait(driver, 10).until(
@@ -78,8 +67,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
         driver.get(search_url)
         print(f"  [+] Navigated to: {search_url}")
 
-        _dismiss_cookie_popup(driver)
-
         result = _get_first_result(driver)
         if result is None:
             return []
@@ -96,7 +83,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
         print("  [+] Loading team matches page...")
 
         time.sleep(2)
-        _dismiss_cookie_popup(driver)
 
         try:
             WebDriverWait(driver, 12).until(
@@ -152,7 +138,6 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
 
         search_url = f"{HLTV_URL}/search#query={tournament_name.replace(" ", "+")}"
         driver.get(search_url)
-        _dismiss_cookie_popup(driver)
 
         result = _get_first_result(driver)
         if result is None:
@@ -168,7 +153,6 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
 
         driver.get(event_url)
         time.sleep(2)
-        _dismiss_cookie_popup(driver)
 
         try:
             WebDriverWait(driver, 12).until(
