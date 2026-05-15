@@ -9,7 +9,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 
-HLTV_URL = "https://www.hltv.org/"
+HLTV_URL = "https://www.hltv.org"
 
 def _create_driver(headless: bool = False) -> webdriver.Chrome:
     options = Options()
@@ -74,7 +74,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
     try:
         print(f"\n[*] Searching HLTV for: '{team_name}'")
 
-        search_url = f"{HLTV_URL}search#query={team_name.replace(" ", "+")}"
+        search_url = f"{HLTV_URL}/search#query={team_name.replace(" ", "+")}"
         driver.get(search_url)
         print(f"  [+] Navigated to: {search_url}")
 
@@ -151,7 +151,7 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
     try:
         print(f"\n[*] Searching HLTV for tournament: '{tournament_name}'")
 
-        search_url = f"{HLTV_URL}search#query={tournament_name.replace(" ", "+")}"
+        search_url = f"{HLTV_URL}/search#query={tournament_name.replace(" ", "+")}"
         driver.get(search_url)
         _dismiss_cookie_popup(driver)
 
