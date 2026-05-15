@@ -15,7 +15,7 @@ def main() -> None:
                 return
             matches = get_team_matches(team, headless=False)
             if matches:
-                print_matches(matches, label=f"Upcoming Matches - {team}")
+                print_matches(matches, label=f"Matches - {team}")
 
         case "2":
             tournament = input("Enter tournament name (e.g. PGL Major 2025): ").strip()
