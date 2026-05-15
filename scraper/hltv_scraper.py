@@ -12,7 +12,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 def create_driver(headless: bool = False) -> webdriver.Chrome:
     options = Options()
 
-    # if headless, Chrome runs in the background, no window opens
     if headless:
         options.add_argument("--headless=new")
 
@@ -28,7 +27,6 @@ def create_driver(headless: bool = False) -> webdriver.Chrome:
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     )
 
-    # using webdriver_manager to auto-download the correct ChromeDriver version
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
 
@@ -74,14 +72,12 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
     try:
         print(f"\n[*] Searching HLTV for: '{team_name}'")
 
-        # navigate to HLTV team search
         search_url = f"https://www.hltv.org/search#query={team_name.replace(" ", "+")}"
         driver.get(search_url)
         print(f"  [+] Navigated to: {search_url}")
 
         dismiss_cookie_popup(driver)
 
-        # find the team link in search results
         try:
             team_link: WebElement = wait_for_element(
                 driver,
@@ -89,7 +85,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
                 ".result-con .team a",
                 timeout=10
             )
-            # get_attribute returns str | None
             team_url: str | None = team_link.get_attribute("href")
             if not team_url:
                 print(f"  [-] Found team element but href was empty.")
@@ -102,7 +97,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
             print(f"  [-] Could not find '{team_name}' on HLTV.")
             return []
 
-        # navigate to the team's matches tab
         matches_url = team_url + "#tab-matchesBox"
         driver.get(matches_url)
         print("  [+] Loading team matches page...")
@@ -111,7 +105,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
         time.sleep(2)
         dismiss_cookie_popup(driver)
 
-        # wait for the matches table to load
         try:
             wait_for_element(
                 driver,
@@ -131,7 +124,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
 
         print(f"  [+] Found {len(match_rows)} upcoming match(es). Extracting data...\n")
 
-        # extract data from each match row
         for row in match_rows:
             try:
                 team1: str = row.find_element(By.CSS_SELECTOR, ".matchTeam.team1 .matchTeamName").text.strip()
@@ -139,7 +131,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
                 event: str = row.find_element(By.CSS_SELECTOR, ".matchEvent .matchEventName").text.strip()
                 date: str  = row.find_element(By.CSS_SELECTOR, ".matchTime").text.strip()
 
-                # get_attribute returns str | None
                 match_url: str | None = row.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
                 if not match_url:
                     continue
@@ -165,7 +156,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
 def get_tournament_matches(tournament_name: str, headless: bool = False) -> list[dict]:
     driver = create_driver(headless=headless)
     matches: list[dict] = []
-    event_display_name: str = tournament_name  # fallback if scraping fails
+    event_display_name: str = tournament_name
 
     try:
         print(f"\n[*] Searching HLTV for tournament: '{tournament_name}'")
@@ -174,7 +165,6 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
         driver.get(search_url)
         dismiss_cookie_popup(driver)
 
-        # find the event/tournament link in search results
         try:
             event_link: WebElement = wait_for_element(
                 driver,
@@ -182,7 +172,6 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
                 ".result-con .event a",
                 timeout=10
             )
-            # guard against None before passing to driver.get()
             event_url: str | None = event_link.get_attribute("href")
             if not event_url:
                 print("  [-] Found event element but href was empty.")
@@ -195,12 +184,10 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
             print(f"  [-] Could not find tournament '{tournament_name}' on HLTV.")
             return []
 
-        # event_url is guaranteed str here
         driver.get(event_url)
         time.sleep(2)
         dismiss_cookie_popup(driver)
 
-        # wait for match schedule to load
         try:
             wait_for_element(driver, By.CSS_SELECTOR, ".matchday", timeout=12)
         except TimeoutException:
