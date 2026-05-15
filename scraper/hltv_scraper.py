@@ -9,7 +9,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 
-def create_driver(headless: bool = False) -> webdriver.Chrome:
+def _create_driver(headless: bool = False) -> webdriver.Chrome:
     options = Options()
 
     if headless:
@@ -32,7 +32,7 @@ def create_driver(headless: bool = False) -> webdriver.Chrome:
 
     return driver
 
-def dismiss_cookie_popup(driver: webdriver.Chrome) -> None:
+def _dismiss_cookie_popup(driver: webdriver.Chrome) -> None:
     try:
         accept_btn = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, ".CybotCookiebotDialogBodyButton"))
@@ -43,7 +43,7 @@ def dismiss_cookie_popup(driver: webdriver.Chrome) -> None:
     except TimeoutException:
         print("  [*] No cookie popup found, continuing...")
 
-def get_first_result(driver: webdriver.Chrome) -> WebElement | None:
+def _get_first_result(driver: webdriver.Chrome) -> WebElement | None:
     try:
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//td[@class='table-header']"))
@@ -66,7 +66,7 @@ def get_first_result(driver: webdriver.Chrome) -> WebElement | None:
         return None
 
 def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
-    driver = create_driver(headless=headless)
+    driver = _create_driver(headless=headless)
     matches: list[dict] = []
 
     try:
@@ -76,7 +76,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
         driver.get(search_url)
         print(f"  [+] Navigated to: {search_url}")
 
-        dismiss_cookie_popup(driver)
+        _dismiss_cookie_popup(driver)
 
         try:
             team_link: WebElement = wait_for_element(
@@ -154,7 +154,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
     return matches
 
 def get_tournament_matches(tournament_name: str, headless: bool = False) -> list[dict]:
-    driver = create_driver(headless=headless)
+    driver = _create_driver(headless=headless)
     matches: list[dict] = []
     event_display_name: str = tournament_name
 
@@ -163,7 +163,7 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
 
         search_url = f"https://www.hltv.org/search#query={tournament_name.replace(" ", "+")}"
         driver.get(search_url)
-        dismiss_cookie_popup(driver)
+        _dismiss_cookie_popup(driver)
 
         try:
             event_link: WebElement = wait_for_element(
