@@ -91,7 +91,7 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
 
         team_display_name: str = result.text.strip()
 
-        matches_url = team_url + "#tab-matchesBox"
+        matches_url = HLTV_URL + team_url + "#tab-matchesBox"
         driver.get(matches_url)
         print("  [+] Loading team matches page...")
 
@@ -146,7 +146,6 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
 def get_tournament_matches(tournament_name: str, headless: bool = False) -> list[dict]:
     driver = _create_driver(headless=headless)
     matches: list[dict] = []
-    event_display_name: str = tournament_name
 
     try:
         print(f"\n[*] Searching HLTV for tournament: '{tournament_name}'")
@@ -155,16 +154,17 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
         driver.get(search_url)
         _dismiss_cookie_popup(driver)
 
-        selected = _get_first_result(driver)
-        if selected is None:
+        result = _get_first_result(driver)
+        if result is None:
             return []
 
-        event_url: str | None = selected.get_attribute("href")
+        event_url: str | None = result.get_attribute("href")
         if not event_url:
             print("  [-] Selected tournament has no valid URL.")
             return []
+        event_url = HLTV_URL + event_url
 
-        event_display_name = selected.text.strip()
+        event_display_name = result.text.strip()
 
         driver.get(event_url)
         time.sleep(2)
