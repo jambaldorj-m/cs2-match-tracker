@@ -78,39 +78,27 @@ def get_team_matches(team_name: str, headless: bool = False) -> list[dict]:
 
         _dismiss_cookie_popup(driver)
 
-        try:
-            team_link: WebElement = wait_for_element(
-                driver,
-                By.CSS_SELECTOR,
-                ".result-con .team a",
-                timeout=10
-            )
-            team_url: str | None = team_link.get_attribute("href")
-            if not team_url:
-                print(f"  [-] Found team element but href was empty.")
-                return []
-
-            team_display_name: str = team_link.text.strip()
-            print(f"  [+] Found: '{team_display_name}' -> {team_url}")
-
-        except TimeoutException:
-            print(f"  [-] Could not find '{team_name}' on HLTV.")
+        result = _get_first_result(driver)
+        if result is None:
             return []
+
+        team_url: str | None = result.get_attribute("href")
+        if not team_url:
+            print("  [-] Selected team has no valid URL.")
+            return []
+
+        team_display_name: str = result.text.strip()
 
         matches_url = team_url + "#tab-matchesBox"
         driver.get(matches_url)
         print("  [+] Loading team matches page...")
 
-        # human-like delay to avoid triggering bot detection
         time.sleep(2)
-        dismiss_cookie_popup(driver)
+        _dismiss_cookie_popup(driver)
 
         try:
-            wait_for_element(
-                driver,
-                By.CSS_SELECTOR,
-                ".matchesTable",
-                timeout=12
+            WebDriverWait(driver, 12).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".matchesTable"))
             )
         except TimeoutException:
             print("  [-] Matches table did not load in time.")
@@ -165,31 +153,25 @@ def get_tournament_matches(tournament_name: str, headless: bool = False) -> list
         driver.get(search_url)
         _dismiss_cookie_popup(driver)
 
-        try:
-            event_link: WebElement = wait_for_element(
-                driver,
-                By.CSS_SELECTOR,
-                ".result-con .event a",
-                timeout=10
-            )
-            event_url: str | None = event_link.get_attribute("href")
-            if not event_url:
-                print("  [-] Found event element but href was empty.")
-                return []
-
-            event_display_name = event_link.text.strip()
-            print(f"  [+] Found event: '{event_display_name}' -> {event_url}")
-
-        except TimeoutException:
-            print(f"  [-] Could not find tournament '{tournament_name}' on HLTV.")
+        selected = _get_first_result(driver)
+        if selected is None:
             return []
+
+        event_url: str | None = selected.get_attribute("href")
+        if not event_url:
+            print("  [-] Selected tournament has no valid URL.")
+            return []
+
+        event_display_name = selected.text.strip()
 
         driver.get(event_url)
         time.sleep(2)
-        dismiss_cookie_popup(driver)
+        _dismiss_cookie_popup(driver)
 
         try:
-            wait_for_element(driver, By.CSS_SELECTOR, ".matchday", timeout=12)
+            WebDriverWait(driver, 12).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".matchday"))
+            )
         except TimeoutException:
             print("  [-] Match schedule did not load.")
             return []
